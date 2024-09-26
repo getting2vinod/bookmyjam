@@ -58,10 +58,11 @@
                     {%else%}              
                         <th>Name</th>
                     {%endif%}
-                    <th>Date</th>
+                    <!-- <th>Date</th> -->
                     <th>Time</th>
                     <th>Duration (Hrs)</th>
                     <th>Booking Status</th>
+                    <th>Payment Ref</th>
                     {%if is_admin %}
                         <th>Action</th>                    
                     {%endif%}
@@ -73,8 +74,8 @@
                 {% set ns = namespace(paymentFor='') %}                
                 {% set ns.paymentFor = ''%}
                 {% for row in filtered_values %}
-                    {%if loop.index0 > 0 and filtered_values[loop.index0][3] != filtered_values[loop.index0-1][3]%}
-                        <tr><td colspan="6">&nbsp;</td></tr>
+                    {%if (loop.index0 > 0 and filtered_values[loop.index0][3] != filtered_values[loop.index0-1][3]) or loop.index0 == 0%}
+                        <tr style="background-color: #eeeee3;"><td colspan="7"><h4>{{row[3]}} - <i>{{row[10]}}</i></h4></td></tr>
                     {%endif%}
                 <tr >
                     
@@ -85,31 +86,37 @@
                        
                         {%endif%}
                     </td>
-                    <td>{{ row[3] }}</td>
+                    <!-- <td>{{ row[3] }}</td> -->
                     <td>{{ row[4] }}</td>
                     <td>{{ row[5] }}</td>
                     <td>
                     {% if row[6] == "Pay Now" %}                         
                          {% set ns.paymentFor = row[0]%}
-                        <a href="#payment" class="btn btn-primary align-middle" data-toggle="collapse" onclick="setValuepayrowid({{row[0]}}, {{row[1]}});">Pay and Confirm</a>
+                         {%if is_admin %}
+                            Payment Pending
+                         {%else%}
+                            <a href="#payment" class="btn btn-primary align-middle" data-toggle="collapse" onclick="setValuepayrowid({{row[0]}}, {{row[1]}});">Pay and Confirm</a>
+                         {%endif%}
                     {% else %}
                         {{row[6]}}
                     {% endif %}
                     </td>
+                    <td>{{row[7]}}</td>
                     {%if is_admin %}
                         {%if row[6] == "Approval Pending"%}
-                            <td><a href="#Confirm" class="btn btn-primary align-middle" onclick="setValueconfirmrowid({{row[0]}}, {{row[1]}});">Confirm</a></td>  
+                            <td><a href="#Confirm" class="btn btn-primary align-middle" onclick="setValueconfirmrowid({{row[0]}}, {{row[1]}});">Approve</a></td>  
                         {%else%}
                             <td>&nbsp;</td>
                         {%endif%}                  
                     {%endif%}
-                    <td>
+                    
                         {% if row[6] != "Cancelled" %}
-                        <button class="btn btn-danger btn-sm align-top" style="top: -10px;" type="submit" onclick="setValuedelrowid({{row[0]}}, {{row[1]}});">X</button>                        
+                        <td><button class="btn btn-danger btn-sm align-top" style="top: -10px;" type="submit" onclick="setValuedelrowid({{row[0]}}, {{row[1]}});">X</button></td>
                         {% else %}
-                        &nbsp;
+                        <td>&nbsp;</td>
                         {% endif %}
                     </td>
+
                 </tr>
                 {% endfor %}
                 {% if filtered_values|length == 0 %}

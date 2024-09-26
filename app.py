@@ -3,6 +3,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
 import datetime
+from waitress import serve
 
 
 app = Flask(__name__)
@@ -34,9 +35,16 @@ def build_list(name_to_filter):
         filtered_values = [row for row in values if row and row[1] == name_to_filter and datetime.datetime.strptime(row[3], "%Y-%m-%d") >= ndate]
     else:
         filtered_values = [row for row in values if row and datetime.datetime.strptime(row[3], "%Y-%m-%d") >= ndate]
-        
     
+    
+    
+    for row in filtered_values:
+        row.append(datetime.datetime.strptime(row[3], '%Y-%m-%d').strftime('%A'))
+
+
+
     filtered_values.sort(key=lambda x: (datetime.datetime.strptime(x[3], '%Y-%m-%d'),datetime.datetime.strptime(x[4], '%H:%M')))
+    [print(row) for row in filtered_values]
     return filtered_values
 
 
@@ -50,7 +58,6 @@ def auth():
        result = service.spreadsheets().values().get(spreadsheetId=SHEET_ID, range=ADMIN_RANGE_NAME).execute()
        values = result.get('values', [])
        filtered_values = [row for row in values if row and row[0] == name_to_filter]
-       print(filtered_values[0][1])
        if filtered_values and passkey == filtered_values[0][1]:
            session["isadmin"] = True
     session["name_to_filter"] = name_to_filter
@@ -94,7 +101,7 @@ def schedule():
 
     service = build('sheets', 'v4', credentials=creds)
     status_val = '=if(INDIRECT(ADDRESS(row(),column()+1))="","Pay Now",if(INDIRECT(ADDRESS(row(),column()+3)),"Confirmed","Approval Pending"))'
-    values = [["=Row()", Mobile, Name, Date, Time, Duration,status_val]]  
+    values = [["=Row()", Mobile, Name, Date, Time, Duration,status_val,'','','FALSE']]  
     
     body = {
         'values': values
@@ -166,3 +173,4 @@ def update_payment():
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)
+    #serve(app, host='0.0.0.0', port=5000)

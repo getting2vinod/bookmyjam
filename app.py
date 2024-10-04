@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, send_from_directory
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
@@ -11,7 +11,7 @@ app.secret_key = "thisismyveryloooongsecretkey"
 
 # Initialize Google Sheets API
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'proud-device-436515-b7-039323121352.json'  # Update this path
+SERVICE_ACCOUNT_FILE = '/json/proud-device-436515-b7-039323121352.json'  # Update this path
 creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
@@ -23,6 +23,11 @@ ADMIN_RANGE_NAME = 'Sheet2!A1:B'
 def index():
     session.clear()
     return render_template('index.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/images'),
+                               'favicon.png', mimetype='image/vnd.microsoft.icon')
 
 def build_list(name_to_filter):
     service = build('sheets', 'v4', credentials=creds)

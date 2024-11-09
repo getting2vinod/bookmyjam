@@ -5,6 +5,10 @@ import os
 import datetime
 from waitress import serve
 
+route_prefix = os.getenv('APP_ROUTE') or ""
+
+if(route_prefix != ""):
+    route_prefix = "/" + route_prefix
 
 app = Flask(__name__)
 app.secret_key = "thisismyveryloooongsecretkey"
@@ -22,7 +26,7 @@ ADMIN_RANGE_NAME = 'Sheet2!A1:B'
 @app.route('/')
 def index():
     session.clear()
-    return render_template('index.html')
+    return render_template('index.html',route=route_prefix)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -71,7 +75,7 @@ def auth():
 @app.route('/list', methods=['GET'])
 def new_and_list():
     filtered_values = build_list(name_to_filter=session['name_to_filter'])    
-    return render_template('home.html', filtered_values=filtered_values, mobile=session['name_to_filter'], is_admin=session.get('isadmin'))
+    return render_template('home.html', filtered_values=filtered_values, mobile=session['name_to_filter'], is_admin=session.get('isadmin'),route=route_prefix)
 
 @app.route('/delete', methods=['POST'])
 def delete():

@@ -70,7 +70,7 @@ def auth():
        if filtered_values and passkey == filtered_values[0][1]:
            session["isadmin"] = True
     session["name_to_filter"] = name_to_filter
-    return redirect('/list')
+    return redirect(route_prefix + '/list')
 
 @app.route('/list', methods=['GET'])
 def new_and_list():
@@ -98,7 +98,7 @@ def delete():
         body=body
     ).execute()
 
-    return redirect('/list')
+    return redirect(route_prefix + '/list')
 
 @app.route('/schedule', methods=['POST'])
 def schedule():
@@ -122,7 +122,7 @@ def schedule():
         body=body
     ).execute()
 
-    return redirect('/list')
+    return redirect(route_prefix + '/list')
 
 @app.route('/confirm', methods=['POST'])
 def update_confirm():
@@ -142,7 +142,7 @@ def update_confirm():
         valueInputOption='RAW',
         body=bodyApproval
     ).execute()
-    return redirect('/list')
+    return redirect(route_prefix + '/list')
     
 @app.route('/paymentconfirm', methods=['POST'])
 def update_payment():
@@ -178,7 +178,7 @@ def update_payment():
         body=bodyApproval
     ).execute()
 
-    return redirect('/list')
+    return redirect(route_prefix + '/list')
 
 if __name__ == '__main__':
     #app.run(debug=True, host="0.0.0.0", port=5000)
